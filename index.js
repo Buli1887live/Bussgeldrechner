@@ -227,7 +227,6 @@ function startCalculating() {
     }
 
        if (!isNaN(systemwanteds) && systemwanteds !== "") {
-        wantedAmount = wantedAmount + parseInt(systemwanteds)
         if (wantedAmount > 5) wantedAmount = 5
     }
 
