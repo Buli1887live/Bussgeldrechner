@@ -227,6 +227,7 @@ function startCalculating() {
     }
 
        if (!isNaN(systemwanteds) && systemwanteds !== "") {
+    
         if (wantedAmount > 5) wantedAmount = 5
     }
 
@@ -283,6 +284,16 @@ function showAttorneys() {
         document.getElementById("attorneyContainer").style.pointerEvents = "none"
     }
 } 
+
+function showRights() {
+    if (document.getElementById("rightsContainer").style.opacity == 0) {
+        document.getElementById("rightsContainer").style.opacity = 1
+        document.getElementById("rightsContainer").style.pointerEvents = ""
+    } else {
+        document.getElementById("rightsContainer").style.opacity = 0
+        document.getElementById("rightsContainer").style.pointerEvents = "none"
+    }
+}
 
 
 window.onload = async () => {

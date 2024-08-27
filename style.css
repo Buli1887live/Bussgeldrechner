@@ -347,6 +347,31 @@ body {
     background-color: rgb(107, 232, 96);
 }
 
+#showRightsButton {
+    width: 70%;
+    height: 4vh;
+    background-color: var(--inputs);
+    border: none;
+    border-radius: 5px;
+    font-size: 1.5vh;
+
+    margin-top: 1.5vh;
+
+    tab-size: 0px;
+    outline: none;
+    box-sizing: border-box;
+    font-weight: 500;
+    color: white;
+
+    transition: all 0.3s;
+
+    position: relative;
+    left: 5%;
+}
+
+#showRightsButton:hover {
+    background-color: rgb(107, 232, 96);
+}
 #resetButton:hover {
     background-color: rgb(255, 44, 44);
 }
@@ -623,6 +648,41 @@ select {
 
 .finesList_fine {
     background-color: var(--inputs);
+}
+
+#rightsContainer {
+    width: 50%;
+    height: 35%;
+
+    position: fixed;
+    z-index: 2;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    background-color: var(--background);
+    box-shadow: 0px 0px 10px black;
+
+    border-radius: 16px;
+
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+#rightsContainer_title {
+    width: 100%;
+    color: white;
+    text-align: center;
+
+    padding-top: 5px;
+    font-size: 25px;
+    font-weight: 600;
+}
+
+#rightsContainer_text {
+    padding: 10px;
+    font-size: 1vw;
+    text-align: center;
 }
 
 /* ! DISCLAIMER */
