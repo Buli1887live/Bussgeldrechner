@@ -56,7 +56,8 @@ body {
     text-align: center;
     line-height: 5vh;
     padding-left: 20px;
-    color: var(--textprim)
+    color: var(--textprim);
+    font-weight: bold;
 }
 
 #searchbar input {
