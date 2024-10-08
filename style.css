@@ -52,12 +52,19 @@ body {
     padding-left: 20px;
 }
 
+#Discord {
+    line-height: 5vh;
+
+    width: auto;
+    height: 5vh;
+}
+
 #sahp {
     text-align: center;
     line-height: 5vh;
     padding-left: 20px;
     color: var(--textprim);
-    font-weight: bold;
+    font-weight: bold
 }
 
 #searchbar input {
