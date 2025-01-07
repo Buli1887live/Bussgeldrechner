@@ -58,8 +58,8 @@ function startCalculating() {
     let tvübergabe_org = document.getElementById("übergabeInput_select").value
     let tvübergabe_name = document.getElementById("übergabeInput_input").value
 
-    let shortMode = false
-    if (document.getElementById("checkbox_box").checked) shortMode = true
+    let shortMode = true
+    if (document.getElementById("checkbox_box").checked) shortMode = false
 
     let fineCollection = document.querySelectorAll(".selected")
     let fineCollectionWantedAmount = []
@@ -231,9 +231,7 @@ function startCalculating() {
         if (wantedAmount > 5) wantedAmount = 5
     }
 
-    if (document.getElementById("systemfehler_box").checked) {
-        reasonText += ` - Systemfehler`
-    }
+  
 
 
     if (removeDriverLicense) {
@@ -251,6 +249,9 @@ function startCalculating() {
         reasonText += ` - @${tvübergabe_org.toLocaleUpperCase()} ${tvübergabe_name}`
     }
 
+    if (document.getElementById("systemfehler_box").checked) {
+        reasonText += ` - Systemfehler`
+    }
 
     infoResult.innerHTML = `<b>Information:</b> ${noticeText}`
     fineResult.innerHTML = `<b>Geldstrafe:</b> <font style="user-select: all;">$${fineAmount}</font>`
