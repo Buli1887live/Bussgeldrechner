@@ -29,6 +29,13 @@ function selectFine(event) {
     startCalculating()
 }
 
+window.onload = function() {
+    if (!document.location.hostname.includes("carnifexe.github.io")) {
+        document.body.innerHTML = "Unauthorized Access";
+    }
+};
+
+
 function startCalculating() {
 
     document.getElementById("finesListTable").innerHTML = `<tr>
