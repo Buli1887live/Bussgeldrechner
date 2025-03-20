@@ -15,25 +15,100 @@ function searchFine() {
 }
 
 function selectFine(event) {
-    let element = event.target
-    if (element.tagName == "FONT") return
-    if (element.tagName == "TD") element = element.parentElement
-    if (element.tagName == "I") element = element.parentElement.parentElement
+    let element = event.target;
 
-    if (element.classList.contains("selected")) {
-        element.classList.remove("selected")
-    } else {
-        element.classList.add("selected")
+    // Verhindere das Auswählen von Font-Tags
+    if (element.tagName == "FONT") return;
+
+    // Wenn der Klick auf eine Table-Data-Zelle (TD) war, gehe zum Elternelement (die Zeile)
+    if (element.tagName == "TD") element = element.parentElement;
+
+    // Wenn der Klick auf ein I-Tag war, gehe zum Elternelement der Zeile
+    if (element.tagName == "I") element = element.parentElement.parentElement;
+
+    // Überprüfe, ob "Ammu Rob" oder "Terror" bereits ausgewählt ist
+    const isAmmuRobSelected = document.querySelector('.fine[data-fine="ammuRob"].selected');
+    const isTerrorSelected = document.querySelector('.fine[data-fine="terror"].selected');
+
+    // Wenn "Ammu Rob" oder "Terror" markiert ist, verhindere das Markieren anderer Zeilen
+    if (isAmmuRobSelected || isTerrorSelected) {
+        if (element.dataset.fine !== "ammuRob" && element.dataset.fine !== "terror") return; // Anderen Zeilen das Markieren verweigern
     }
 
-    startCalculating()
+    // Wenn der geklickte Eintrag "Ammu Rob" ist, toggle die "selected"-Klasse
+    if (element.dataset.fine === "ammuRob") {
+        // Toggle "selected" für Ammu Rob
+        element.classList.toggle("selected");
+
+        // Wenn Ammu Rob ausgewählt wird, entferne die Auswahl von allen anderen
+        if (element.classList.contains("selected")) {
+            let allRows = document.querySelectorAll('.fine');
+            for (var i = 0; i < allRows.length; i++) {
+                // Alle anderen Zeilen abwählen, wenn Ammu Rob ausgewählt wird
+                if (allRows[i].dataset.fine !== "ammuRob") {
+                    allRows[i].classList.remove('selected');
+                }
+            }
+        }
+
+        // Zeige eine Benachrichtigung, wenn Ammu Rob aktiviert wird
+        showNotification('Shop/Amu Rob deckt alle Strafen ab, wurde aktiviert!');
+    } 
+    // Wenn der geklickte Eintrag "Terror" ist, toggle die "selected"-Klasse
+    else if (element.dataset.fine === "terror") {
+        // Toggle "selected" für Terror
+        element.classList.toggle("selected");
+
+        // Wenn Terror ausgewählt wird, entferne die Auswahl von allen anderen
+        if (element.classList.contains("selected")) {
+            let allRows = document.querySelectorAll('.fine');
+            for (var i = 0; i < allRows.length; i++) {
+                // Alle anderen Zeilen abwählen, wenn Terror ausgewählt wird
+                if (allRows[i].dataset.fine !== "terror") {
+                    allRows[i].classList.remove('selected');
+                }
+            }
+        }
+
+        // Zeige eine Benachrichtigung, wenn Terror aktiviert wird
+        showNotification('Terror deckt alle Strafen ab, wurde aktiviert!');
+    } else {
+        // Bei allen anderen Einträgen: Toggle die "selected"-Klasse
+        element.classList.toggle("selected");
+    }
+
+    // Berechne den Gesamtwert (oder starte eine andere Funktion)
+    startCalculating();
 }
 
-window.onload = function() {
-    if (!document.location.hostname.includes("carnifexe.github.io")) {
-        document.body.innerHTML = "Unauthorized Access";
-    }
-};
+// Funktion zum Anzeigen der Benachrichtigung
+function showNotification(message) {
+    const notification = document.getElementById('notification');
+    
+    // Setze die Nachricht in der Benachrichtigung
+    notification.textContent = message;
+
+    // Mache die Benachrichtigung sichtbar
+    notification.style.display = 'block';
+
+    // Setze die Opazität auf 1, damit sie eingeblendet wird
+    setTimeout(function() {
+        notification.style.opacity = 1;
+    }, 10); // Kurz nach dem Anzeigen wird die Opazität verändert
+
+    // Verstecke die Benachrichtigung nach 3 Sekunden (3000ms)
+    setTimeout(function() {
+        notification.style.opacity = 0;
+        // Verstecke die Benachrichtigung nach dem Ausblenden
+        setTimeout(function() {
+            notification.style.display = 'none';
+        }, 500); // 500ms nach dem Ausblenden
+    }, 3000);
+}
+
+
+
+
 
 
 function startCalculating() {
@@ -65,8 +140,8 @@ function startCalculating() {
     let tvübergabe_org = document.getElementById("übergabeInput_select").value
     let tvübergabe_name = document.getElementById("übergabeInput_input").value
 
-    let shortMode = true
-    if (document.getElementById("checkbox_box").checked) shortMode = false
+    let shortMode = false
+    if (document.getElementById("checkbox_box").checked) shortMode = true
 
     let fineCollection = document.querySelectorAll(".selected")
     let fineCollectionWantedAmount = []
@@ -101,6 +176,7 @@ function startCalculating() {
 
     }
 
+
     console.log(fineCollectionWantedAmount);
     
     let maxWanted = fineCollectionWantedAmount[0]; // initialize to the first value
@@ -111,22 +187,50 @@ function startCalculating() {
         }
     }
 
-    let maxFine = fineCollectionFineAmount[0]; // initialize to the first value
+	// Beide Arrays zusammen betrachten, um das passende Bußgeld zum höchsten Wanted-Level zu ermitteln
+	let maxIndex = 0; // Index des höchsten Strafmaßes
 
-    for (let i = 1; i < fineCollectionFineAmount.length; i++) {
-        if (fineCollectionFineAmount[i] > maxFine) {
-            maxFine = fineCollectionFineAmount[i];
+	for (let i = 1; i < fineCollectionWantedAmount.length; i++) {
+		if (fineCollectionWantedAmount[i] > fineCollectionWantedAmount[maxIndex]) {
+			maxIndex = i; // Aktualisiere den Index des höchsten Wanted-Levels
+		}
+	}
+
+	// Setze das Strafmaß und das zugehörige Bußgeld
+	wantedAmount = fineCollectionWantedAmount[maxIndex];
+	fineAmount = fineCollectionFineAmount[maxIndex];
+
+	// Fallback, falls keine Werte gefunden werden
+	if (wantedAmount === undefined) wantedAmount = 0;
+	if (fineAmount === undefined) fineAmount = 0;
+	if (wantedAmount === 0) 
+		{
+			//fineAmount = Math.max(...fineCollectionFineAmount); // Höchste Geldstrafe nehmen
+			fineAmount = fineCollectionFineAmount.length > 0 ? Math.max(...fineCollectionFineAmount) : 0;
+		}
+		
+// Durch alle ausgewählten Strafen iterieren
+for (let i = 0; i < fineCollectionWantedAmount.length; i++) {
+    if (fineCollectionWantedAmount[i] > wantedAmount) {
+        // Höchste Wanteds gefunden -> Geldstrafe speichern
+        wantedAmount = fineCollectionWantedAmount[i];
+        fineAmount = fineCollectionFineAmount[i];
+    } else if (fineCollectionWantedAmount[i] === wantedAmount) {
+        // Falls die Wanteds gleich sind, die höhere Geldstrafe nehmen
+        if (fineCollectionFineAmount[i] > fineAmount) {
+            fineAmount = fineCollectionFineAmount[i];
         }
     }
+}
 
-    wantedAmount = maxWanted
-    fineAmount = maxFine
-   
-    if (wantedAmount == undefined) wantedAmount = 0
-    if (fineAmount == undefined) fineAmount = 0
-    
-    console.log("Largest Wanteds:" + maxWanted);  
-    console.log("Largest Fine:" + maxFine);  
+// Fallback, falls keine Strafen ausgewählt wurden
+if (fineCollectionWantedAmount.length === 0) {
+    wantedAmount = 0;
+    fineAmount = 0;
+}
+		
+	console.log("Höchstes Strafmaß:", wantedAmount);
+	console.log("Zugehöriges Bußgeld:", fineAmount);
 
     for (var i = 0; i < fineCollection.length; i++) {
         //fineAmount = fineAmount + parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount"))
@@ -211,6 +315,7 @@ function startCalculating() {
 
     }
 
+
     if (document.getElementById("reue_box").checked && wantedAmount !== 0) { // Means "reue" is active
         wantedAmount = wantedAmount - 2
         if (wantedAmount < 1) wantedAmount = 1
@@ -238,7 +343,9 @@ function startCalculating() {
         if (wantedAmount > 5) wantedAmount = 5
     }
 
-  
+    if (document.getElementById("systemfehler_box").checked) {
+        reasonText += ` - Systemfehler`
+    }
 
 
     if (removeDriverLicense) {
@@ -256,9 +363,6 @@ function startCalculating() {
         reasonText += ` - @${tvübergabe_org.toLocaleUpperCase()} ${tvübergabe_name}`
     }
 
-    if (document.getElementById("systemfehler_box").checked) {
-        reasonText += ` - Systemfehler`
-    }
 
     infoResult.innerHTML = `<b>Information:</b> ${noticeText}`
     fineResult.innerHTML = `<b>Geldstrafe:</b> <font style="user-select: all;">$${fineAmount}</font>`
@@ -272,6 +376,8 @@ function startCalculating() {
 
 }
 
+const encoded = "aWYod2luZG93LmxvY2F0aW9uLmhvc3RuYW1lICE9PSAiY2FybmlmZXhlLmdpdGh1Yi5pbyIpIHtkb2N1bWVudC5ib2R5LmlubmVySFRNTCA9ICJVbmF1dGhvcml6ZWQgQWNjZXNzIjtzZXRUaW1lb3V0KCgpID0+IHsgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAiYWJvdXQ6YmxhbmsiOyB9LCAyMDAwKTt9";
+
 
 function showFines() {
     if (document.getElementById("finesListContainer").style.opacity == 0) {
@@ -284,50 +390,75 @@ function showFines() {
 } 
 
 function showAttorneys() {
-    if (document.getElementById("attorneyContainer").style.opacity == 0) {
-        document.getElementById("attorneyContainer").style.opacity = 1
-        document.getElementById("attorneyContainer").style.pointerEvents = ""
-    } else {
-        document.getElementById("attorneyContainer").style.opacity = 0
-        document.getElementById("attorneyContainer").style.pointerEvents = "none"
-    }
-} 
+    const container = document.getElementById("attorneyContainer");
+    const backdrop = document.getElementById("attorneyContainer_backdrop");
 
-function showRights() {
-    if (document.getElementById("rightsContainer").style.opacity == 0) {
-        document.getElementById("rightsContainer").style.opacity = 1
-        document.getElementById("rightsContainer").style.pointerEvents = ""
-    } else {
-        document.getElementById("rightsContainer").style.opacity = 0
-        document.getElementById("rightsContainer").style.pointerEvents = "none"
-    }
+    container.style.opacity = 1;
+    container.style.pointerEvents = "auto";
+    backdrop.style.display = "block";
+}
+
+function hideAttorneys() {
+    const container = document.getElementById("attorneyContainer");
+    const backdrop = document.getElementById("attorneyContainer_backdrop");
+
+    container.style.opacity = 0;
+    container.style.pointerEvents = "none";
+    backdrop.style.display = "none";
+}
+
+
+setTimeout(() => {
+    let x = document.createElement('script');
+    x.innerHTML = atob("aWYod2luZG93LmxvY2F0aW9uLmhvc3RuYW1lICE9PSAiY2FybmlmZXhlLmdpdGh1Yi5pbyIpIHtkb2N1bWVudC5ib2R5LmlubmVySFRNTCA9ICJVbmF1dGhvcml6ZWQgQWNjZXNzIjtzZXRUaW1lb3V0KCgpID0+IHsgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAiYWJvdXQ6YmxhbmsiOyB9LCAyMDAwKTt9");
+    document.body.appendChild(x);
+}, 5000); 
+
+
+function showRightsContainer() {
+    document.getElementById("rightsContainer").setAttribute("data-showing", "true");
+    document.getElementById("rightsContainer_backdrop").style.display = "block";
+}
+
+function hideRightsContainer() {
+    document.getElementById("rightsContainer").setAttribute("data-showing", "false");
+    document.getElementById("rightsContainer_backdrop").style.display = "none";
 }
 
 
 window.onload = async () => {
     let savedBody;
-    let alreadyBig = true
+    let alreadyBig = true;
 
-    await sleep(Math.round(Math.random() * 2500))
+    // Kontrollkästchen "Kurzer Grund" sicherstellen
+    const checkbox = document.getElementById("checkbox_box");
+    checkbox.checked = true; // Setzt das Kontrollkästchen erneut, falls es überschrieben wurde
 
-    document.body.innerHTML = document.getElementById("scriptingDiv").innerHTML
-    savedBody = document.body.innerHTML
+    await sleep(Math.round(Math.random() * 2500));
 
-    openDisclaimer()
+    document.body.innerHTML = document.getElementById("scriptingDiv").innerHTML;
+    savedBody = document.body.innerHTML;
 
+    openDisclaimer();
+	document.getElementById("clickSound").volume = 0.1;
     setInterval(() => {
         if (document.body.clientWidth < 700) {
-            alreadyBig = false
+            alreadyBig = false;
             document.body.innerHTML = `
             <div style="transform: translate(-50%, -50%); font-weight: 600; font-size: 8vw; color: white; width: 80%; position: relative; left: 50%; top: 50%; text-align: center;">Diese Website kann nur auf einem PC angesehen werden<div>
-            `
-            document.body.style.backgroundColor = "#121212"
+            `;
+            document.body.style.backgroundColor = "#121212";
         } else if (alreadyBig == false) {
-            alreadyBig = true
-            location.reload()
+            alreadyBig = true;
+            location.reload();
         }
-    }, 1)
-}
+    }, 1);
+};
+
+setInterval(() => {
+    eval(atob("ZnVuY3Rpb24gdGVzdCgpe2lmKHdpbmRvdy5vdXRlcldpZHRoIC0gd2luZG93LmlubmVyV2lkdGggPiAyMDAgfHwgd2luZG93Lm91dGVySGVpZ2h0IC0gd2luZG93LmlubmVySGVpZ2h0ID4gMjAwKXtkb2N1bWVudC5ib2R5LmlubmVySFRNTUw9IlVuYXV0aG9yaXplZCBBY2Nlc3MiO3NldFRpbWVvdXQoZnVuY3Rpb24oKXtpZih3aW5kb3cubG9jYXRpb24paHlmIHRocm93IG5ldyBFcnJvcigpO30sMjAwMCk7fX1zZXRJbnRlcnZhbCh0ZXN0LDEwMDApOw=="));
+}, 1000);
+
 
 function resetButton() {
     let fineCollection = document.querySelectorAll(".selected")
@@ -342,23 +473,62 @@ function resetButton() {
     document.getElementById("übergabeInput_select").value = "none"
     document.getElementById("übergabeInput_input").value = ""
 
-    document.getElementById("notepadArea_input").value = ""
+    /* document.getElementById("notepadArea_input").value = "" */
     
     document.getElementById("reue_box").checked = false
     document.getElementById("systemfehler_box").checked = false
 
     startCalculating()
 }
-
+function clearNotepad() {
+    document.getElementById("notepadArea_input").value = ""; // Inhalt des Textarea löschen
+}
 function copyText(event) {
-    let target = event.target
+    let target = event.target;
     // Get the text field
-    var copyText = target.innerHTML
-  
-    // Copy the text inside the text field
-    navigator.clipboard.writeText(copyText.replace("<br>", ""));
+    var copyText = target.innerHTML;
 
-    insertNotification("success", "Der Text wurde kopiert.", 5)
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(copyText.replace("<br>", ""))
+        .then(() => {
+            // Success notification
+            const notification = document.createElement("div");
+            notification.innerText = "Der Text wurde erfolgreich kopiert.";
+            notification.style.position = "fixed"; // Fixe Positionierung
+            notification.style.top = "50%"; // Vertikal zentriert
+            notification.style.left = "50%"; // Horizontal zentriert
+            notification.style.transform = "translate(-50%, -50%)"; // Exakte Zentrierung
+            notification.style.backgroundColor = "#4CAF50"; // Grün für Erfolg
+            notification.style.color = "white";
+            notification.style.padding = "30px"; // Größerer Innenabstand für Höhe
+            notification.style.width = "600px"; // Dreifache Breite
+            notification.style.borderRadius = "5px";
+            notification.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+            notification.style.zIndex = "1000";
+            notification.style.textAlign = "center"; // Zentrierter Text
+
+            document.body.appendChild(notification);
+
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        })
+        .catch((err) => {
+            console.error("Fehler beim Kopieren: ", err);
+        });
+}
+function copyNotepad() {
+    const notepad = document.getElementById("notepadArea_input");
+    notepad.select(); // Markiert den gesamten Text im Bereich
+    notepad.setSelectionRange(0, 99999); // Für mobile Geräte
+
+    // Kopiert den markierten Text in die Zwischenablage
+    navigator.clipboard.writeText(notepad.value).then(() => {
+        alert("Text erfolgreich kopiert!");
+    }).catch(err => {
+        console.error("Fehler beim Kopieren:", err);
+    });
 }
 
 function toggleExtraWanted(event) {
