@@ -14,6 +14,35 @@ function searchFine() {
     }
 }
 
+document.addEventListener('contextmenu',function(e){e.preventDefault();e.stopPropagation();});
+
+document.addEventListener("DOMContentLoaded", function() {
+    let countdownValue = 15; // Startwert des Countdowns in Sekunden
+    let countdownInterval; // Intervall für den Countdown
+
+    // Funktion zum Aktualisieren des Countdowns <br><i>Gilt nicht für Cannabis</i>
+    function updateCountdown() {
+        if (countdownValue > 0) {
+            document.getElementById("countdown").textContent = countdownValue; // Countdown-Text aktualisieren
+            countdownValue--;
+        } else {
+            disclaimerAccepted(); // Button automatisch klicken
+            clearInterval(countdownInterval); // Countdown stoppen
+        }
+    }
+
+    // Countdown-Intervall alle 1 Sekunde starten
+    countdownInterval = setInterval(updateCountdown, 1000);
+
+    // Funktion, die beim Klick auf "Verstanden" ausgeführt wird
+    window.disclaimerAccepted = function() {
+        if (document.getElementById("disclaimer")) { // Überprüfen, ob das Element noch existiert
+            document.getElementById("disclaimer").style.display = "none"; // Disclaimer verstecken
+            document.getElementById("disclaimerBackgroundBlocker").style.display = "none"; // Hintergrundblocker verstecken
+        }
+    };
+});
+
 function selectFine(event) {
     let element = event.target;
 
@@ -81,6 +110,13 @@ function selectFine(event) {
     startCalculating();
 }
 
+
+document.querySelectorAll(".fine").forEach(fine => {
+    fine.addEventListener("click", function() {
+        this.classList.toggle("selected");
+        showSelectedFinesTable();
+    });
+});
 // Funktion zum Anzeigen der Benachrichtigung
 function showNotification(message) {
     const notification = document.getElementById('notification');
@@ -112,26 +148,24 @@ function showNotification(message) {
 
 
 function startCalculating() {
+    console.log("START CALCULATING");
 
-    document.getElementById("finesListTable").innerHTML = `<tr>
-                    <th style="width: 80%;">Grund für die Geldstrafe</th>
-                    <th style="width: 20%;">Bußgeld</th>
-                </tr>`
-
+    document.getElementById("finesListTable").innerHTML
+	let isWiederholungstäter = document.getElementById("wiederholungstäter_box").checked;
     let fineResult = document.getElementById("fineResult")
     let fineAmount = 0
-
+	
     let wantedResult = document.getElementById("wantedsResult")
     let wantedAmount = 0
-
+	
     let characterResult = document.getElementById("charactersResult")
-
+	
     let reasonResult = document.getElementById("reasonResult")
     let reasonText = ""
     let plate = document.getElementById("plateInput_input").value
     let blitzerort = document.getElementById("blitzerInput_input").value
     let systemwanteds = document.getElementById("systemwantedsInput_input").value
-
+	
     let infoResult = document.getElementById("infoResult")
     let noticeText = ""
     let removeWeaponLicense = false
@@ -143,42 +177,53 @@ function startCalculating() {
     let shortMode = false
     if (document.getElementById("checkbox_box").checked) shortMode = true
 
-    let fineCollection = document.querySelectorAll(".selected")
+    let fineCollection = document.querySelectorAll(".fine.selected")
     let fineCollectionWantedAmount = []
     let fineCollectionFineAmount = []
 
-    for (var i = 0; i < fineCollection.length; i++) { 
 
 
+for (var i = 0; i < fineCollection.length; i++) { 
+    let paragraphText = fineCollection[i].querySelector(".paragraph").innerText;
+    let isStVO = paragraphText.includes("StVO");
 
-        let cache_wanted_amount = 0;
+    let cache_wanted_amount = parseInt(fineCollection[i].querySelector(".wantedAmount").getAttribute("data-wantedamount")) || 0;
+    let cache_fine_amount = parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount")) || 0;
 
-        cache_wanted_amount = cache_wanted_amount + parseInt(fineCollection[i].querySelector(".wantedAmount").getAttribute("data-wantedamount"))
-        
-        cache_wanted_amount = cache_wanted_amount + fineCollection[i].querySelector(".wantedAmount").querySelectorAll(".selected_extrawanted").length
-        if (cache_wanted_amount > 5) cache_wanted_amount = 5
+    let extraWantedCount = 0;
+    let extrawanteds_found = fineCollection[i].querySelector(".wantedAmount").querySelectorAll(".selected_extrawanted");
 
-        fineCollectionWantedAmount.push(cache_wanted_amount)
-
-
-        let cache_fine_amount = 0;
-
-        cache_fine_amount = cache_fine_amount + parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount"))
-
-        let extrawanteds_found = fineCollection[i].querySelector(".wantedAmount").querySelectorAll(".selected_extrawanted")
-        let extrafines_amount = 0
-        for (let b = 0; b < extrawanteds_found.length; b++) {
-            if (extrawanteds_found[b].getAttribute("data-addedfine")) cache_fine_amount = cache_fine_amount + parseInt(extrawanteds_found[b].getAttribute("data-addedfine"))
-            extrafines_amount = extrafines_amount + parseInt(extrawanteds_found[b].getAttribute("data-addedfine"))
-        }
-
-        fineCollectionFineAmount.push(cache_fine_amount)
-
+    for (let b = 0; b < extrawanteds_found.length; b++) {
+        extraWantedCount++;
     }
+
+    if (isWiederholungstäter && isStVO) {
+        cache_fine_amount *= 2;
+        cache_wanted_amount *= 2;
+        extraWantedCount *= 2;
+    } else if (!isWiederholungstäter && isStVO) {
+        cache_fine_amount = parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount")) || 0;
+        cache_wanted_amount = parseInt(fineCollection[i].querySelector(".wantedAmount").getAttribute("data-wantedamount")) || 0;
+    }
+
+    if (isStVO) {
+        cache_wanted_amount += extraWantedCount;
+    }
+
+    if (cache_fine_amount > 50000) cache_fine_amount = 50000;
+	if (cache_wanted_amount > 5) cache_wanted_amount = 5;
+
+fineCollectionWantedAmount.push(cache_wanted_amount);
+fineCollectionFineAmount.push(cache_fine_amount);
+
+}
+
+
+
+
 
 
     console.log(fineCollectionWantedAmount);
-    
     let maxWanted = fineCollectionWantedAmount[0]; // initialize to the first value
 
     for (let i = 1; i < fineCollectionWantedAmount.length; i++) {
@@ -248,6 +293,7 @@ if (fineCollectionWantedAmount.length === 0) {
         //if (wantedAmount > 5) wantedAmount = 5
         
 
+
         const d = new Date();
         const localTime = d.getTime();
         const localOffset = d.getTimezoneOffset() * 60000;
@@ -294,24 +340,7 @@ if (fineCollectionWantedAmount.length === 0) {
 
         
 
-        if (fineCollection[i].classList.contains("addPlateInList")) {
-
-            document.getElementById("finesListTable").innerHTML +=
-            `
-            <tr class="finesList_fine">
-                <td onclick="JavaScript:copyText(event)">${day}.${month} ${hour}:${minute} - ${fineCollection[i].querySelector(".paragraph").innerHTML} - ${fineText}${plate !== "" ? " - " + plate.toLocaleUpperCase() : ""}${blitzerort !== "" ? " - " + blitzerort : ""}</td>
-                <td>$${parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount")) + extrafines_amount}</td>
-            </tr>
-            `
-        } else {
-            document.getElementById("finesListTable").innerHTML +=
-            `
-            <tr class="finesList_fine">
-                <td onclick="JavaScript:copyText(event)">${day}.${month} ${hour}:${minute} - ${fineCollection[i].querySelector(".paragraph").innerHTML} - ${fineText}</td>
-                <td>$${parseInt(fineCollection[i].querySelector(".fineAmount").getAttribute("data-fineamount")) + extrafines_amount}</td>
-            </tr>
-            `
-        }
+       
 
     }
 
@@ -320,6 +349,7 @@ if (fineCollectionWantedAmount.length === 0) {
         wantedAmount = wantedAmount - 2
         if (wantedAmount < 1) wantedAmount = 1
     }
+document.getElementById("wiederholungstäter_box").addEventListener("change", startCalculating);
 
     if (plate != "") {
         reasonText += ` - ${plate.toLocaleUpperCase()}`
@@ -332,7 +362,12 @@ if (fineCollectionWantedAmount.length === 0) {
     if (document.getElementById("reue_box").checked) {
         reasonText += ` - StGB §35`
     }
-
+    if (document.getElementById("wiederholungstäter_box").checked) {
+        reasonText += ` - StGB §25`
+    }
+    if (document.getElementById("systemfehler_box").checked) {
+        reasonText += ` - Systemfehler`
+    }
     if (systemwanteds != "") {
         reasonText += ` + ${systemwanteds} Systemwanteds`
 	    if (systemwanteds > 5) systemwanteds = 5
@@ -343,9 +378,7 @@ if (fineCollectionWantedAmount.length === 0) {
         if (wantedAmount > 5) wantedAmount = 5
     }
 
-    if (document.getElementById("systemfehler_box").checked) {
-        reasonText += ` - Systemfehler`
-    }
+
 
 
     if (removeDriverLicense) {
@@ -378,6 +411,31 @@ if (fineCollectionWantedAmount.length === 0) {
 
 const encoded = "aWYod2luZG93LmxvY2F0aW9uLmhvc3RuYW1lICE9PSAiY2FybmlmZXhlLmdpdGh1Yi5pbyIpIHtkb2N1bWVudC5ib2R5LmlubmVySFRNTCA9ICJVbmF1dGhvcml6ZWQgQWNjZXNzIjtzZXRUaW1lb3V0KCgpID0+IHsgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAiYWJvdXQ6YmxhbmsiOyB9LCAyMDAwKTt9";
 
+function toggleCheckboxLabel(checkboxId, labelId) {
+    var checkbox = document.getElementById(checkboxId);
+    var label = document.getElementById(labelId);
+    if (checkbox.checked) {
+        label.textContent = "An";
+        label.style.color = "green";
+    } else {
+        label.textContent = "Aus";
+        label.style.color = "red";
+    }
+}
+
+function playbubbleSound() {
+    var audio = document.getElementById("bubbleSound");
+    if (audio) {
+        audio.play().catch(error => console.error("Sound konnte nicht abgespielt werden:", error));
+    }
+}
+
+function playClickSound() {
+    var audio = document.getElementById("clickSound");
+    if (audio) {
+        audio.play().catch(error => console.error("Sound konnte nicht abgespielt werden:", error));
+    }
+}
 
 function showFines() {
     if (document.getElementById("finesListContainer").style.opacity == 0) {
@@ -407,12 +465,11 @@ function hideAttorneys() {
     backdrop.style.display = "none";
 }
 
-
 //setTimeout(() => {
 //    let x = document.createElement('script');
 //    x.innerHTML = atob("aWYod2luZG93LmxvY2F0aW9uLmhvc3RuYW1lICE9PSAiY2FybmlmZXhlLmdpdGh1Yi5pbyIpIHtkb2N1bWVudC5ib2R5LmlubmVySFRNTCA9ICJVbmF1dGhvcml6ZWQgQWNjZXNzIjtzZXRUaW1lb3V0KCgpID0+IHsgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAiYWJvdXQ6YmxhbmsiOyB9LCAyMDAwKTt9");
 //    document.body.appendChild(x);
-//}, 5000); 
+//}, 5000);
 
 
 function showRightsContainer() {
@@ -424,7 +481,6 @@ function hideRightsContainer() {
     document.getElementById("rightsContainer").setAttribute("data-showing", "false");
     document.getElementById("rightsContainer_backdrop").style.display = "none";
 }
-
 
 window.onload = async () => {
     let savedBody;
@@ -455,9 +511,6 @@ window.onload = async () => {
     }, 1);
 };
 
-setInterval(() => {
-    eval(atob("ZnVuY3Rpb24gdGVzdCgpe2lmKHdpbmRvdy5vdXRlcldpZHRoIC0gd2luZG93LmlubmVyV2lkdGggPiAyMDAgfHwgd2luZG93Lm91dGVySGVpZ2h0IC0gd2luZG93LmlubmVySGVpZ2h0ID4gMjAwKXtkb2N1bWVudC5ib2R5LmlubmVySFRNTUw9IlVuYXV0aG9yaXplZCBBY2Nlc3MiO3NldFRpbWVvdXQoZnVuY3Rpb24oKXtpZih3aW5kb3cubG9jYXRpb24paHlmIHRocm93IG5ldyBFcnJvcigpO30sMjAwMCk7fX1zZXRJbnRlcnZhbCh0ZXN0LDEwMDApOw=="));
-}, 1000);
 
 
 function resetButton() {
@@ -476,6 +529,7 @@ function resetButton() {
     /* document.getElementById("notepadArea_input").value = "" */
     
     document.getElementById("reue_box").checked = false
+    document.getElementById("wiederholungstäter_box").checked = false
     document.getElementById("systemfehler_box").checked = false
 
     startCalculating()
@@ -627,3 +681,4 @@ async function openDisclaimer() {
 
     disclaimerNode.style.boxShadow = "rgba(0, 0, 0, 0.219) 0px 0px 70px 30vw"
 }
+document.documentElement.setAttribute("translate", "no");

@@ -2,7 +2,7 @@
     --textprim: #bababa;
     --textsecond: #ffffff;
     --button: #2b2b2b;
-    --accent: #525600;
+    --accent: #727272;
     --buttonhover: #6565ff;
     --background: #1d1d1d;
     --inputs: #121212;
@@ -14,7 +14,10 @@
     color: var(--textprim);
 }
 
-html {  height: 100%; }
+html {  
+    height: 100%; 
+    overflow: hidden;
+}
 
 body {
     width: 100%;
@@ -107,10 +110,24 @@ body {
     }
   }
   
+.jw-album-image img, .jw-element-image img { 
+    
+    pointer-events: none; 
+    -webkit-touch-callout: none; 
+
+}
+
+.pswp__share-tooltip .pswp__share--download { 
+    
+    display: none; 
+}
 
 #header {
     width: 100%;
     height: 5%;
+    padding: 10px;
+    text-align: center;
+    align-items: center; 
 
     background-color: var(--inputs);
     border-bottom-left-radius: 10px;
@@ -118,11 +135,18 @@ body {
 
     display: grid;
     grid-template-columns: 33.333% 33.333% 33.333%;
+
+    justify-content: space-between; 
+    
+    overflow-x: hidden;
+    overflow-y: hidden;
+    
+    position: relative;
 }
 
 #title {
     line-height: 5vh;
-
+    height: 5%;
     padding-left: 20px;
     font-size: 3vh;
     font-weight: 600;
@@ -131,36 +155,52 @@ body {
 
 #credits {
     text-align: left;
-    line-height: 5vh;
+  
     padding-left: 20px;
+    padding-bottom: 6px;
 }
 
-#Discord {
-    line-height: 5vh;
 
-    width: auto;
-    height: 5vh;
+#sahp_container {
+
+    display: flex;
+    
 }
 
-#sahp {
+#sahp_container img {
+    width: 32px;
+    height: 32px;
+
+    margin-right: 5px;
+}
+
+#sahp_title_text {
     text-align: center;
-    line-height: 5vh;
-    padding-left: 20px;
+
+
     color: var(--textprim);
-    font-weight: bold
+    font-weight: bold;
+    
+    font-size: 1.5em;
+
+}
+
+#searchbar {
+    text-align: right;
+    margin: 1vh;
+  
+
 }
 
 #searchbar input {
-    float: right;
-    width: 70%;
+    margin-right: 1vh;
+    width: 75.8%;
     height: 3vh;
     background-color: var(--background);
     border: none;
-    border-radius: 5px;
+    border-radius: 1px;
     font-size: 1.5vh;
 
-    margin-top: 1vh;
-    margin-right: 20px;
 
     tab-size: 0px;
     outline: none;
@@ -171,6 +211,13 @@ body {
     text-indent: 5px;
 }
 
+#wiederholungstäter {
+    position: relative;
+    left: 5%;
+    width: 90%;
+    margin-top: 1vh;
+    margin-bottom: 0.5vh;
+}
 #contentbox {
     width: 100%;
     height: 94.5%;
@@ -188,11 +235,13 @@ body {
 
 #fineslist {
     background-color: var(--background);
-    border-radius: 10px;
+    border-radius: 1px;
     margin: 1vh;
-    overflow: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
+    height: 100%; 
+
 }
+
 
 #fineslist::-webkit-scrollbar {
     display: none;
@@ -202,47 +251,71 @@ body {
     display: none;
 }
 
-
-#results {
-    background-color: var(--background);
-    border-radius: 10px;
-    margin: 1vh;
-    margin-left: 0;
-
-    overflow-y: scroll;
-    overflow-x: hidden;
-
-    padding-bottom: 30px;
-}
-
 #fineslist table {
-    overflow: hidden;
 
-    margin-top: 2%;
+    margin-top: -0.5%;
 
     width: 100%;
-}
-
-#fineslist table {
     border-spacing: 3px;
 }
 
-#finesHeader th {
-    position: sticky;
-    overflow: visible;
-    color: white;
-    font-size: 20px;
-    z-index: 50;
+#fineslist tbody {
+    max-height: 300px;
+    overflow-y: auto;
+   
 }
+
 
 #fineslist table tr td {
     text-align: center;
 
     transition: all 0.3s;
+   
 }
+
+/* Erste Zeile: Spaltenüberschriften */
+.stickyHeader {
+    position: sticky;
+    top: 0;
+    background-color: var(--background);
+    z-index: 20;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+}
+
+/* Sticky Kategoriezeilen */
+.categoryRow td {
+    position: sticky;
+    top: 40px; /* gleiche Höhe wie stickyHeader */
+    background-color: var(--inputs);
+    z-index: 10;
+    font-weight: bold;
+    text-align: center;
+    color: var(--accent);
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* Zweite Zeile: Kategorieüberschrift */
+.categoryHeader th {
+    padding: 10px 0px;
+    position: sticky;
+    top: 40px; /* Genaue Höhe der ersten Zeile */
+    background-color: var(--background); /* Oder var(--background), je nach Farbschema */
+    z-index: 10;
+}
+
+
+.stickyHeader,
+.categoryHeader th {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
 
 .fine {
     transition: all 0.3s;
+   
 }
 
 .showing {
@@ -261,39 +334,27 @@ body {
 .selected td {
     color: white;
 }
-#logoContainer {
-    margin-top: 10px; /* Abstand zum vorherigen Element */
-    text-align: center; /* Zentriert das Logo im Container */
-    margin-left: 20px; /* Verschiebt das Logo 20px nach rechts */
+
+
+#results {
+    background-color: var(--background);
+    border-radius: 1px;
+    margin: 1vh;
+    margin-left: 0;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    padding-bottom: 30px;
 }
 
-#logo {
-	animation: blink 10s infinite; /* Die Animation blinkt alle 1 Sekunde unendlich oft */
-    width: 200px; /* Setze die Breite auf 200px */
-    height: auto; /* Automatische Höhe basierend auf der Breite */
-    opacity: 0.8; /* Leichte Transparenz für einen sanften Effekt */
-}
 
-#logo:hover {
-    opacity: 1; /* Vollständig sichtbar beim Überfahren mit der Maus */
-}
-@keyframes blink {
-    0% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0; /* Logo wird unsichtbar */
-    }
-    100% {
-        opacity: 1; /* Logo wird wieder sichtbar */
-    }
-}
 #disclaimer {
     position: fixed; /* Fixiert das Element relativ zum Viewport */
     top: 50%; /* Vertikale Mitte */
     left: 50%; /* Horizontale Mitte */
     transform: translate(-50%, -50%); /* Zentriert das Element exakt */
-    background-color: white; /* Hintergrundfarbe */
+    background-color: var(--button); /* Hintergrundfarbe */
     border: 2px solid #ccc; /* Optionale Umrandung */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Leichter Schatten */
     padding: 20px; /* Innenabstand */
@@ -301,7 +362,7 @@ body {
     text-align: center; /* Text zentrieren */
     width: 50%; /* Optionale Breite */
     max-width: 600px; /* Maximale Breite */
-    border-radius: 10px; /* Abgerundete Ecken */
+    /* border-radius: 1px; /* Abgerundete Ecken */ 
 }
 
 #disclaimer_button {
@@ -422,6 +483,8 @@ body {
 .categoryHeader th {
     color: var(--buttonhover);
     font-size: 20px;
+    position: sticky;
+    top: 0;
 }
 
 #resetButton {
@@ -744,66 +807,6 @@ select {
     text-indent: 5px;
 }
 
-
-
-#finesListContainer {
-    width: 50%;
-    height: 50%;
-
-    position: fixed;
-    z-index: 2;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    background-color: var(--background);
-    box-shadow: 0px 0px 10px black;
-
-    border-radius: 16px;
-
-    overflow-y: scroll;
-
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-#fineListContainer[data-showing="true"] {
-    opacity: 1;
-}
-
-#finesListContainer::-webkit-scrollbar {
-    display: none;
-}
-
-#finesListContainer_title {
-    width: 100%;
-    color: white;
-    text-align: center;
-
-    padding-top: 5px;
-    font-size: 25px;
-    font-weight: 600;
-}
-
-#finesListContainer table {
-    position: relative;
-    width: 95%;
-    margin-top: 10px;
-    left: 2.5%;
-    border-spacing: 3px;
-
-    color: white;
-    text-align: center;
-}
-
-#finesListContainer table tr th {
-    color: white;
-}
-
-.finesList_fine {
-    background-color: var(--inputs);
-}
-
 #rightsContainer {
     width: 60%;
     max-width: 800px;
@@ -812,7 +815,7 @@ select {
     overflow-y: auto;
     overflow-x: hidden;
     position: fixed;
-    z-index: 1000;
+    z-index: 10000;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -838,7 +841,7 @@ select {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 9999;
     display: none;
 }
 
@@ -907,6 +910,9 @@ select {
     left: 50%;
     max-width: 35vw;
 
+    width: fit-content;
+    height: fit-content;
+
     z-index: 100;
 
     background-color: #0e0e0e;
@@ -917,6 +923,7 @@ select {
     box-shadow: rgba(0, 0, 0, 0.219) 0px 0px 70px 0vw;
 
     transition: 1s all ease;
+    
 }
 
 #disclaimer_title {
@@ -940,7 +947,6 @@ select {
     color: white;
     font-size: 1vw;
     border-radius: 1.75vh;
-    padding: 10px;
 
     font-weight: 500;
     
@@ -1001,39 +1007,199 @@ select {
     width: 10vw;
 }
 
-.dots-container {
+.five-pointed-star {
+    width: 28px;
+    height: 28px;
+    background-color: #ffff00;
+    clip-path: polygon(
+        50% 0%, 61% 35%, 98% 35%, 
+        68% 57%, 79% 91%, 50% 70%, 
+        21% 91%, 32% 57%, 2% 35%, 39% 35%
+    );
+    display: inline-block;
+    margin: 10px;
+    animation: blink 1.5s infinite alternate, rotate 5s infinite linear;
+}
+
+.five-pointed-star:nth-child(1) {
+    animation-delay: 0s, 0s;
+}
+.five-pointed-star:nth-child(2) {
+    animation-delay: 0.3s, 1s;
+}
+.five-pointed-star:nth-child(3) {
+    animation-delay: 0.6s, 2s;
+}
+.five-pointed-star:nth-child(4) {
+    animation-delay: 0.9s, 1.5s;
+}
+.five-pointed-star:nth-child(5) {
+    animation-delay: 1.2s, 0.5s;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
+body {
+    overflow-x: hidden;
+}
+
+#notepadArea {
+    position: relative;
+    margin-bottom: 10px; /* Abstand zum nächsten Element */
+}
+
+#notepadArea_input {
+    width: 300px; /* Feste Breite für die Textarea */
+    height: 80px; /* Feste Höhe für die Textarea */
+    resize: none; /* Verhindert, dass der Benutzer die Größe ändern kann */
+}
+
+#clearButton {
+    cursor: pointer;
+    color: red; /* Textfarbe für den Löschen-Button */
+    font-weight: bold;
+    position: relative;
+    right: 20px; /* Abstand vom rechten Rand der Textarea */
+    top: -70px; /* Abstand vom oberen Rand der Textarea */
+    background: none;
+    border: none;
+    font-size: 16px;
+    z-index: 1; /* Stellt sicher, dass der Button über der Textarea liegt */
+}
+/* Stil für die Benachrichtigung */
+#notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f44336;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 5px;
+    font-size: 16px;
+    display: none; /* Standardmäßig unsichtbar */
+    z-index: 9999; /* Damit es oben auf allen anderen Elementen liegt */
+    opacity: 0; /* Startet unsichtbar */
+    transition: opacity 0.5s ease-in-out; /* Sanfte Einblendung */
+}
+
+/* Styling für das Tooltip-Fenster */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 450px;
+    background-color: black;
+    color: #ff4d4d;
+    text-align: center;
+    border-radius: 5px;
+    padding: 10px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 10000;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+    /* CSS für das Video */
+    #doj_link {
+        text-align: center; /* Zentriert den Link */
+        margin: 10px 0; /* Fügt oben und unten einen Abstand hinzu */
+    }
+    #doj_logo {
+        width: 30%; /* Setzt die Breite des DOJ-Logos auf 30% */
+        max-width: 150px; /* Maximale Breite für das Logo */
+    }
+    /* Style für das Notizfeld und den Lösch-Button */
+/* Style für das Notizfeld und die Buttons */
+
+.toggle-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    text-align: center;
+    user-select: none;
+}
+
+.toggle-button.active {
+    background-color: #ff0000; /* Rote Farbe, wenn aktiviert */
+}
+
+#container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    width: 100%;
-    padding-top: 10px;
-  }
+}
+#radioPlayer {
+    width: 100%; /* Nimmt die gesamte verfügbare Breite ein */
+    display: flex;
+    justify-content: center; /* Zentriert den Player unter dem Button */
+    margin-top: 10px; /* Abstand zum Button */
+}
 
-  .dot {
-    height: 20px;
-    width: 20px;
-    margin-right: 10px;
-    border-radius: 10px;
-    background-color: #ffff00;
-    animation: pulse 1.5s infinite ease-in-out;
-  }
-  
-  .dot:last-child {
-    margin-right: 0;
-  }
-  
-  .dot:nth-child(1) {
-    animation-delay: -0.3s;
-  }
-  
-  .dot:nth-child(2) {
-    animation-delay: -0.1s;
-  }
-  
-  .dot:nth-child(3) {
-    animation-delay: 0.1s;
-  }
+#radioPlayer iframe {
+    width: 70%; /* Feste Breite – gleiche Breite wie der Zurücksetzen-Button */
+}
+
+
+#logo {
+    animation: rotateLogo 10s linear infinite, blinkLogo 2.5s infinite alternate;
+}
+
+/* Rotation */
+@keyframes rotateLogo {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Blinken */
+@keyframes blinkLogo {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.3;
+    }
+}
   
   @keyframes pulse {
     0% {
@@ -1060,7 +1226,7 @@ select {
     height: 80%;
     overflow-y: hidden;
     position: fixed;
-    z-index: 1000;
+    z-index: 10000;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -1084,7 +1250,7 @@ select {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 9999;
     display: none;
 }
 
@@ -1159,6 +1325,7 @@ select {
     font-size: 10px;
     font-weight: bold;
     overflow: hidden;
+    z-index: 100;
 }
 .help-button::before {
     content: "?";
